@@ -3,6 +3,8 @@ var express = require('express');
 var app = express();
 // express handlebars
 var exphbs = require('express-handlebars');
+// require http module
+var http = require('http');
 
 app.engine('handlebars', exphbs({defaultLayout: 'main}'}));
 app.set('view engine', 'handlebars');
@@ -16,7 +18,31 @@ app.get('/hello-gif', function (req,res) {
 });
 
 app.get('/', function (req, res) {
-    res.render('home')
+    console.log(req.query.term)
+    var queryString = req.query.term;
+    // remove white spaces and restricted characters
+    var term = encodeURIComponent(queryString)
+    // put search term in giphy api search gify URL
+    var url = 'http://api.giphy.com/v1/gifs/search?q=' + term + '&api_key=dc6zaTOxFJmzC'
+
+    http.get(url, function(response) {
+        // set encoding of response to utf8
+        response.setEncoding('utf8');
+
+        var body = '';
+
+        response.on('data', function(d) {
+            // continously update stream with data from giphy
+            body += d;
+        });
+
+        response.on('end', function() {
+            // when data is fulled recieved parse into json
+            var parsed = JSON.parse(body);
+            // render the home template and pass the gif data in to the template
+            res.render('home', {gifs: parsed.data})
+        });
+    });
 });
 
 app.get('/greetings/:name' , function(req, res) {

@@ -10,6 +10,8 @@ var giphy = require('giphy-api')();
 
 app.engine('handlebars', exphbs({defaultLayout: 'main'}));
 app.set('view engine', 'handlebars');
+// telling express app that static files will be in public folder
+app.use(express.static('public'));
 
 app.get('/hello-gif', function (req,res) {
     // Look up gif from the database
@@ -20,6 +22,9 @@ app.get('/hello-gif', function (req,res) {
 });
 
 app.get('/', function (req, res) {
+    // display search term in terminal
+    console.log(req.query.term)
+    // search term and render image
     giphy.search(req.query.term, function (err, response) {
         res.render('home', {gifs: response.data})
     })

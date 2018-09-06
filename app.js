@@ -22,10 +22,11 @@ app.get('/hello-gif', function (req,res) {
 });
 
 app.get('/', function (req, res) {
+    let searchTerm = req.query.term || "funny cat";
     // display search term in terminal
-    console.log(req.query.term)
+    console.log(searchTerm)
     // search term and render image
-    giphy.search(req.query.term, function (err, response) {
+    giphy.search(searchTerm, function (err, response) {
         res.render('home', {gifs: response.data})
     })
 });
